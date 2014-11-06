@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Date::Manip;
+
+if ($#ARGV != 1) {
+  die("USAGE: ./snooze-mail TIME QUERY");
+}
+
+my $time = $ARGV[0];
+my $query = $ARGV[1];
+
+# replace +Nm by +Nmin, since we rarely mean months by m.
+$time =~ s/([0-9]+)m$/$1min/;
+
+my $abstime = UnixDate($time, "%H:%M %m%d%Y");
+
+`echo 'notmuch tag +inbox $query' | at \"$abstime\" >/dev/null 2>&1`;
+
+print "Snoozed until: ", UnixDate($time, "%c"), "\n";
+
+# Local Variables:
+# mode: cperl
+# End:
