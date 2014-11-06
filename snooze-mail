@@ -22,8 +22,9 @@ my $abstime = UnixDate($time, "%H:%M %m%d%Y");
 `notmuch tag $tagchanges $query`;
 
 # Invert tag changes:
-$tagchanges =~ s/\+/-/g;
+$tagchanges =~ s/\+/###/g;
 $tagchanges =~ s/-/+/g;
+$tagchanges =~ s/###/-/g;
 
 `echo 'notmuch tag $tagchanges $query' | at \"$abstime\" >/dev/null 2>&1`;
 
