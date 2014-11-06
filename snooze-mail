@@ -15,7 +15,7 @@ my $query = $ARGV[1];
 $time =~ s/([0-9]+)m$/$1min/;
 
 my $abstime = UnixDate($time, "%H:%M %m%d%Y");
-
+`notmuch tag -inbox $query`;
 `echo 'notmuch tag +inbox $query' | at \"$abstime\" >/dev/null 2>&1`;
 
 print "Snoozed until: ", UnixDate($time, "%c"), "\n";

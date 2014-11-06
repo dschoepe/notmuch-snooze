@@ -11,8 +11,8 @@ TIME can be any time accepted by the perl library Date::Manip."
 	   (with-temp-buffer
 	     (with-output-to-string
 	       (call-process "snooze-mail" nil standard-output nil time query)))))
-      (notmuch-tag query '("-inbox"))
-      (message (replace-in-string output "\n" "" output))))
+      (message (replace-in-string output "\n" "" output)))
+    (notmuch-refresh-this-buffer))
 
 (defun notmuch-tree-snooze (time)
   "Snooze message until TIME.
