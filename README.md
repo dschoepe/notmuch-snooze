@@ -2,24 +2,25 @@
 
 ## Description
 
-A small script to "snooze" emails in the
-[notmuch](http://notmuchmail.org/) email client, i.e. remove messages
-from the inbox and add them again later after a specified amount of
-time.
+A small tool to "snooze" emails in the [notmuch](http://notmuchmail.org/) email
+client, i.e. remove messages from the inbox and add them again later at a
+specified time.
 
 ## Installation
 
-The `snooze-mail` script requires a running
-[at](https://packages.qa.debian.org/a/at.html) daemon and the Perl
-library
-[Date::Manip](http://search.cpan.org/~sbeck/Date-Manip/lib/Date/Manip.pod).
+Add `(require 'notmuch-snooze)` to your Emacs configuration to load the package
+and bind the function `notmuch-snooze` to a key, for example `S`:
 
-To install it, put the snooze-mail script somewhere in your `PATH`. For Emacs
-integration, load the `notmuch-snooze.el` file in your Emacs configuration by
-adding its directory to `load-path` and call `(require 'notmuch-snooze)`.
+    (define-key notmuch-search-mode-map (kbd "S") #'notmuch-snooze)
+    (define-key notmuch-show-mode-map (kbd "S") #'notmuch-snooze)
+    (define-key notmuch-tree-mode-map (kbd "S") #'notmuch-snooze)
 
-Keys for the various notmuch-modes can be bound as follows:
+Additionally, the `notmuch-unsnooze` script needs to be called
+in regular intervals (for example when fetching mail) to unsnooze
+previously snoozed messages. The script requires python bindings
+for notmuch to be installed.
 
-    (define-key notmuch-search-mode-map (kbd "S") #'notmuch-search-snooze)
-    (define-key notmuch-show-mode-map (kbd "S") #'notmuch-show-snooze)
-    (define-key notmuch-tree-mode-map (kbd "S") #'notmuch-tree-snooze)
+## Credits
+
+I rewrote this to store the unsnooze time in a tag; this idea is
+taken from a [discussion](http://notmuch.198994.n3.nabble.com/email-snoozing-in-notmuch-td4032734.html) on the notmuch mailing list.
