@@ -9,11 +9,15 @@ specified time.
 ## Installation
 
 Add `(require 'notmuch-snooze)` to your Emacs configuration to load the package
-and bind the function `notmuch-snooze` to a key, for example `S`:
+and bind the functions `notmuch-snooze` and `notmuch-unsnooze` to keys, for
+example `S` and `U`:
 
     (define-key notmuch-search-mode-map (kbd "S") #'notmuch-snooze)
     (define-key notmuch-show-mode-map (kbd "S") #'notmuch-snooze)
     (define-key notmuch-tree-mode-map (kbd "S") #'notmuch-snooze)
+    (define-key notmuch-search-mode-map (kbd "U") #'notmuch-unsnooze)
+    (define-key notmuch-show-mode-map (kbd "U") #'notmuch-unsnooze)
+    (define-key notmuch-tree-mode-map (kbd "U") #'notmuch-unsnooze)
 
 Additionally, the `notmuch-unsnooze` script needs to be called
 in regular intervals (for example when fetching mail) to unsnooze
