@@ -1,38 +1,32 @@
 (require 'notmuch)
 
-(defun notmuch-snooze (time query)
+(defun notmuch-snooze-query (time query)
   "Snoozes messages matching QUERY until TIME.
-Displays the output of snooze-mail with newlines removed in the minibuffer.
-Snoozing means removing the inbox tag of messages matching the query
-and scheduling re-adding the inbox tag at TIME.
 
-TIME can be any time accepted by the perl library Date::Manip."
-    (let ((output
-	   (with-temp-buffer
-	     (with-output-to-string
-	       (call-process "snooze-mail" nil standard-output nil time query)))))
-      (message (replace-in-string output "\n" "" output)))
-    (notmuch-refresh-this-buffer))
+Snoozing a message removes the inbox tag and adds a snoozed tag
+along with a tag encoding when the message should be re-added to
+the inbox."
+  (let ((time-hm (format-time-string "%d%m%Y-%H%M" time)))
+    (notmuch-tag query
+                 (list "-inbox" "+snoozed" (concat "+snoozed"
+                                                   time-hm)))))
 
-(defun notmuch-tree-snooze (time)
-  "Snooze message until TIME.
-See `notmuch-snooze' for details on the format of TIME."
-  (interactive "MSnooze until: ")
-  (notmuch-snooze time (notmuch-tree-get-message-id))
-  (notmuch-tree-next-matching-message))
-
-(defun notmuch-show-snooze (time)
-  "Snooze message until TIME.
-See `notmuch-snooze' for details on the format of TIME."
-  (interactive "MSnooze until: ")
-  (notmuch-snooze time (notmuch-show-get-message-id))
-  (notmuch-show-next-matching-message))
-
-(defun notmuch-search-snooze (time)
-  "Snooze message until TIME.
-See `notmuch-snooze' for details on the format of TIME."
-  (interactive "MSnooze until: ")
-  (notmuch-snooze time (notmuch-search-find-thread-id))
-  (notmuch-search-next-thread))
+;;;###autoload
+(defun notmuch-snooze ()
+  "Query for a time and snooze the currently selected message until that time."
+  (interactive)
+  (let* ((time (org-read-date nil t))
+         (time-str (format-time-string "%c" time))
+          ;;(time (call-interactively #'notmuch-snooze-read-date))
+          (query
+           (cond
+            ((eq major-mode 'notmuch-tree-mode) (notmuch-tree-get-message-id))
+            ((eq major-mode 'notmuch-show-mode) (notmuch-show-get-message-id))
+            ((eq major-mode 'notmuch-search-mode)
+             (car (notmuch-search-find-stable-query))))))
+    (when query
+      (notmuch-snooze-query time query)
+      (message "Snoozed until: %s" time-str)
+      (notmuch-refresh-this-buffer))))
 
 (provide 'notmuch-snooze)
