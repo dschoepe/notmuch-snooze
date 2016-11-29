@@ -45,7 +45,9 @@ of tag changes is in the same format as `notmuch-tag'."
 (defun notmuch-snooze ()
   "Query for a time and snooze the currently selected message until that time."
   (interactive)
-  (let* ((time (org-read-date nil t))
+  (let* ((time
+          (let ((org-read-date-prefer-future t))
+            (org-read-date nil t))
          (time-str (format-time-string "%c" time))
           ;;(time (call-interactively #'notmuch-snooze-read-date))
           (query
