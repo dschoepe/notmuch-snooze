@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from notmuch import Query, Database
 from datetime import datetime
 import re
