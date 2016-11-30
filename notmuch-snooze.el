@@ -1,4 +1,5 @@
 (require 'notmuch)
+(require 'org)
 
 (defun notmuch-snooze-query (time query)
   "Snoozes messages matching QUERY until TIME.
