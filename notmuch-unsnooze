@@ -8,11 +8,11 @@ def unsnooze(db):
     for msg in db.messages("tag:snoozed"):
         print("Checking message: " + msg.header("Subject"))
         for tag in msg.tags:
-            match = re.search('snoozed([0-9]{8}-[0-9]{4})', tag)
+            match = re.search('snoozed-until-([0-9]{8}-[0-9]{4})', tag)
             if match is not None:
                 print("\tFound matching tag: " + match.group(1))
                 try:
-                    t = datetime.strptime(match.group(1), '%d%m%Y-%H%M')
+                    t = datetime.strptime(match.group(1), '%Y%m%d-%H%M')
                     print("\t\tUnsnooze date: " + str(t))
                     if t <= now:
                         print("Unsnoozing: " + msg.messageid)
