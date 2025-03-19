@@ -8,7 +8,7 @@ def unsnooze(db):
     for msg in db.messages("tag:snoozed"):
         print("Checking message: " + msg.header("Subject"))
         for tag in msg.tags:
-            match = re.search('snoozed-until-([0-9]{8}-[0-9]{4})', tag)
+            match = re.search('snoozed/until-([0-9]{8}-[0-9]{4})', tag)
             if match is not None:
                 print("\tFound matching tag: " + match.group(1))
                 try:
