@@ -1,33 +1,30 @@
 #!/usr/bin/env python3
-from notmuch import Query, Database
+from notmuch2 import Database
 from datetime import datetime
 import re
 
 def unsnooze(db):
     now = datetime.now()
-    for msg in Query(db, "tag:snoozed").search_messages():
-        print("Checking message: " + msg.get_header("Subject"))
-        for tag in msg.get_tags():
-            match = re.search('snoozed([0-9]{8}-[0-9]{4})', tag)
+    for msg in db.messages("tag:snoozed"):
+        print("Checking message: " + msg.header("Subject"))
+        for tag in msg.tags:
+            match = re.search('snoozed/until-([0-9]{8}-[0-9]{4})', tag)
             if match is not None:
                 print("\tFound matching tag: " + match.group(1))
                 try:
-                    t = datetime.strptime(match.group(1), '%d%m%Y-%H%M')
+                    t = datetime.strptime(match.group(1), '%Y%m%d-%H%M')
                     print("\t\tUnsnooze date: " + str(t))
                     if t <= now:
-                        print("Unsnoozing: " + msg.get_message_id())
-                        msg.freeze()
-                        msg.remove_tag(tag)
-                        msg.remove_tag("snoozed")
-                        msg.add_tag("inbox")
-                        msg.thaw()
+                        print("Unsnoozing: " + msg.messageid)
+                        with msg.frozen():
+                            msg.tags.remove(tag)
+                            msg.tags.remove("snoozed")
+                            msg.tags.add("inbox")
                 except ValueError as e:
                     # couldn't parse time, do nothing
                     # print("\t\t" + e)
                     pass
 
 if __name__ == "__main__":
-    db = Database(mode=Database.MODE.READ_WRITE)
-    unsnooze(db)
-    db.close()
-
+    with Database(mode=Database.MODE.READ_WRITE) as db:
+        unsnooze(db)

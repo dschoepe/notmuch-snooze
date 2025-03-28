@@ -7,9 +7,9 @@
 Snoozing a message removes the inbox tag and adds a snoozed tag
 along with a tag encoding when the message should be re-added to
 the inbox."
-  (let ((time-hm (format-time-string "%d%m%Y-%H%M" time)))
+  (let ((time-hm (format-time-string "%Y%m%d-%H%M" time)))
     (notmuch-tag query
-                 (list "-inbox" "+snoozed" (concat "+snoozed"
+                 (list "-inbox" "+snoozed" (concat "+snoozed/until-"
                                                    time-hm)))))
 
 (defun notmuch-unsnooze-helper (get-tag-func tag-func)
@@ -20,11 +20,16 @@ returns a list of tags for the currently selected message, and
 a function TAG-FUNC taking a list of tag changes as an argument
 and updates the current message's tags accordingly. The list
 of tag changes is in the same format as `notmuch-tag'."
+
+  (let ((was-snoozed nil))
   (mapc
    (lambda (tag)
-     (when (string-match-p "^snoozed\\([0-9]\\{8\\}-[0-9]\\{4\\}\\)?$" tag)
-       (funcall tag-func (list (concat "-" tag)))))
-   (funcall get-tag-func)))
+     (when (string-match-p "^snoozed\\(/until-[0-9]\\{8\\}-[0-9]\\{4\\}\\)?$" tag)
+       (funcall tag-func (list (concat "-" tag)))
+       (setq was-snoozed t)))
+   (funcall get-tag-func))
+  (when was-snoozed
+    (funcall tag-func (list (concat "+inbox"))))))
 
 ;;;###autoload
 (defun notmuch-unsnooze ()
